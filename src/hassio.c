@@ -11,12 +11,12 @@
 
 /* expected hook */
 PAM_EXTERN int pam_sm_setcred( pam_handle_t *pamh, int flags, int argc, const char **argv ) {
-	return PAM_SUCCESS;
+    return PAM_SUCCESS;
 }
 
 PAM_EXTERN int pam_sm_acct_mgmt(pam_handle_t *pamh, int flags, int argc, const char **argv) {
-	printf("Acct mgmt\n");
-	return PAM_SUCCESS;
+    printf("Acct mgmt\n");
+    return PAM_SUCCESS;
 }
 
 
@@ -44,14 +44,14 @@ static int callHassio(const char* pUsername, const char* pPassword) {
 
     // cURL setup
     curl_easy_setopt(pCurl, CURLOPT_NOPROGRESS, 1L);
-	curl_easy_setopt(pCurl, CURLOPT_FAILONERROR, 1L);
-	curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 5);
+    curl_easy_setopt(pCurl, CURLOPT_FAILONERROR, 1L);
+    curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 5);
 
 	// synchronous, but we don't really care
-	res = curl_easy_perform(pCurl);
-	curl_easy_cleanup(pCurl);
+    res = curl_easy_perform(pCurl);
+    curl_easy_cleanup(pCurl);
 
-	return res;
+    return res;
 }
 
 /* expected hook, this is where custom stuff happens */
