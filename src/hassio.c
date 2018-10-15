@@ -33,7 +33,7 @@ static int callHassio(const char* pUsername, const char* pPassword) {
     pHeader = curl_slist_append(pHeader, hassio_token);
 
     // Base setup
-	curl_easy_setopt(pCurl, CURLOPT_URL, "http://hassio/auth");
+    curl_easy_setopt(pCurl, CURLOPT_URL, "http://hassio/auth");
     curl_easy_setopt(pCurl, CURLOPT_POST, 1L);
     curl_easy_setopt(pCurl, CURLOPT_HTTPHEADER, pHeader);
 
@@ -47,7 +47,7 @@ static int callHassio(const char* pUsername, const char* pPassword) {
     curl_easy_setopt(pCurl, CURLOPT_FAILONERROR, 1L);
     curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 5);
 
-	// synchronous, but we don't really care
+    // synchronous, but we don't really care
     res = curl_easy_perform(pCurl);
     curl_easy_cleanup(pCurl);
 
@@ -56,35 +56,35 @@ static int callHassio(const char* pUsername, const char* pPassword) {
 
 /* expected hook, this is where custom stuff happens */
 PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, const char **argv) {
-	int ret = 0;
-	const char* pUsername = NULL;
+    int ret = 0;
+    const char* pUsername = NULL;
 
-	struct pam_message msg;
-	struct pam_conv* pItem;
-	struct pam_response* pResp;
-	const struct pam_message* pMsg = &msg;
+    struct pam_message msg;
+    struct pam_conv* pItem;
+    struct pam_response* pResp;
+    const struct pam_message* pMsg = &msg;
 
-	msg.msg_style = PAM_PROMPT_ECHO_OFF;
-	msg.msg = "Hass.io Auth: ";
+    msg.msg_style = PAM_PROMPT_ECHO_OFF;
+    msg.msg = "Hass.io Auth: ";
 
-	if (pam_get_user(pamh, &pUsername, NULL) != PAM_SUCCESS) {
-		return PAM_AUTH_ERR;
-	}
+    if (pam_get_user(pamh, &pUsername, NULL) != PAM_SUCCESS) {
+        return PAM_AUTH_ERR;
+    }
 
-	if (pam_get_item(pamh, PAM_CONV, (const void**)&pItem) != PAM_SUCCESS || !pItem) {
-		fprintf(stderr, "Couldn't get pam_conv\n");
-		return PAM_AUTH_ERR;
-	}
+    if (pam_get_item(pamh, PAM_CONV, (const void**)&pItem) != PAM_SUCCESS || !pItem) {
+        fprintf(stderr, "Couldn't get pam_conv\n");
+        return PAM_AUTH_ERR;
+    }
 
-	pItem->conv(1, &pMsg, &pResp, pItem->appdata_ptr);
+    pItem->conv(1, &pMsg, &pResp, pItem->appdata_ptr);
 
-	ret = PAM_SUCCESS;
-	if (callHassio(pUsername, pResp[0].resp) != 0) {
-		ret = PAM_AUTH_ERR;
-	}
+    ret = PAM_SUCCESS;
+    if (callHassio(pUsername, pResp[0].resp) != 0) {
+        ret = PAM_AUTH_ERR;
+    }
 
-	memset(pResp[0].resp, 0, strlen(pResp[0].resp));
-	free(pResp);
+    memset(pResp[0].resp, 0, strlen(pResp[0].resp));
+    free(pResp);
 
-	return ret;
+    return ret;
 }
