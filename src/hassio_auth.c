@@ -57,9 +57,7 @@ static int callHassio(const char* pUsername, const char* pPassword) {
 /* expected hook, this is where custom stuff happens */
 PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, const char **argv) {
 	int ret = 0;
-
 	const char* pUsername = NULL;
-	const char* pUrl = NULL;
 
 	struct pam_message msg;
 	struct pam_conv* pItem;
