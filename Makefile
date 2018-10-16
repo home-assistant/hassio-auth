@@ -1,10 +1,10 @@
 CFLAGS += -Werror -Wall
-all: test hassio.so
+all: test pam_hassio.so
 
 clean:
-	$(RM) test hassio.so *.o
+	$(RM) test pam_hassio.so *.o
 
-hassio.so: src/hassio.c
+pam_hassio.so: src/pam_hassio.c
 	$(CC) $(CFLAGS) -fPIC -shared -Xlinker -x -o $@ $< -lcurl
 
 test: src/test.c
