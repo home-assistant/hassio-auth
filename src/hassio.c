@@ -23,7 +23,7 @@ PAM_EXTERN int pam_sm_acct_mgmt(pam_handle_t *pamh, int flags, int argc, const c
 /* Function to handle stuff from HTTP response. */
 static int callHassio(const char* pUsername, const char* pPassword) {
     CURL* pCurl = curl_easy_init();
-    curl_slist *pHeader = NULL;
+    struct curl_slist *pHeader = NULL;
 	
     char hassio_token[128];
     int res = -1;
@@ -49,7 +49,10 @@ static int callHassio(const char* pUsername, const char* pPassword) {
 
     // synchronous, but we don't really care
     res = curl_easy_perform(pCurl);
+
+    // Cleanup
     curl_easy_cleanup(pCurl);
+    curl_slist_free_all(pHeader);
 
     return res;
 }
