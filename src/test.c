@@ -1,3 +1,8 @@
+/*
+# /etc/pam.d/check_user
+auth       required     pam_hassio.so
+account    required     pam_hassio.so
+*/
 #include <security/pam_appl.h>
 #include <security/pam_misc.h>
 #include <stdio.h>

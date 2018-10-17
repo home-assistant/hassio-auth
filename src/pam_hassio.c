@@ -15,10 +15,12 @@ PAM_EXTERN int pam_sm_setcred( pam_handle_t *pamh, int flags, int argc, const ch
 }
 
 PAM_EXTERN int pam_sm_acct_mgmt(pam_handle_t *pamh, int flags, int argc, const char **argv) {
-    printf("Acct mgmt\n");
     return PAM_SUCCESS;
 }
 
+static int writeFn(void* buf, size_t len, size_t size, void* userdata) {
+	return len * size;
+}
 
 /* Function to handle stuff from HTTP response. */
 static int callHassio(const char* pUsername, const char* pPassword) {
@@ -27,22 +29,28 @@ static int callHassio(const char* pUsername, const char* pPassword) {
 	
     char hassio_token[128];
     int res = -1;
+    char *pEncUsername = curl_easy_escape(pCurl, pUsername, 0);
+    char *pEncPassword = curl_easy_escape(pCurl, pPassword, 0);
+    size_t fields_size = strlen(pEncUsername) + strlen(pEncPassword) + 21;
+    char *pFields = malloc(fields_size);
     
     // Hass.io Token
     snprintf(hassio_token, 128, "X-Hassio-Key: %s", getenv("HASSIO_TOKEN"));
     pHeader = curl_slist_append(pHeader, hassio_token);
+
+    // prepare
+    snprintf(pFields, fields_size, "username=%s&password=%s", pEncUsername, pEncPassword);
 
     // Base setup
     curl_easy_setopt(pCurl, CURLOPT_URL, "http://hassio/auth");
     curl_easy_setopt(pCurl, CURLOPT_POST, 1L);
     curl_easy_setopt(pCurl, CURLOPT_HTTPHEADER, pHeader);
 
-    // Auth setup
-    curl_easy_setopt(pCurl, CURLOPT_USERNAME, pUsername);
-    curl_easy_setopt(pCurl, CURLOPT_PASSWORD, pPassword);
-    curl_easy_setopt(pCurl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    // Data setup
+    curl_easy_setopt(pCurl, CURLOPT_POSTFIELDS, pFields);
 
     // cURL setup
+    curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, writeFn);
     curl_easy_setopt(pCurl, CURLOPT_NOPROGRESS, 1L);
     curl_easy_setopt(pCurl, CURLOPT_FAILONERROR, 1L);
     curl_easy_setopt(pCurl, CURLOPT_TIMEOUT, 5);
@@ -53,6 +61,9 @@ static int callHassio(const char* pUsername, const char* pPassword) {
     // Cleanup
     curl_easy_cleanup(pCurl);
     curl_slist_free_all(pHeader);
+    curl_free(pEncUsername);
+    curl_free(pEncPassword);
+    free(pFields);
 
     return res;
 }
