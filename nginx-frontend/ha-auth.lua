@@ -77,5 +77,6 @@ if not authenticated then
     ngx.header.www_authenticate = 'Basic realm="Home Assistant"'
     ngx.status = ngx.HTTP_UNAUTHORIZED
     ngx.say('401 Access Denied')
+    ngx.exit(ngx.HTTP_UNAUTHORIZED)
 end
 
