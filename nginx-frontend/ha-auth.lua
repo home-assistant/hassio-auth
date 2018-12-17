@@ -1,6 +1,7 @@
 local http = require "resty.http"
 local auths = ngx.shared.auths
 
+
 function authenticate()
 
     --- Test Authentication header is set and with a value
@@ -66,17 +67,15 @@ function authenticate()
     return false
 end
 
--- Only authenticate if its not disabled
-if not os.getenv('DISABLE_HA_AUTHENTICATION') then
 
-    --- Try to authenticate against HA
-    local authenticated = authenticate()
+--- Try to authenticate against HA
+local authenticated = authenticate()
 
-    --- If authentication failed, throw a basic auth
-    if not authenticated then
-       ngx.header.content_type = 'text/plain'
-       ngx.header.www_authenticate = 'Basic realm="Home Assistant"'
-       ngx.status = ngx.HTTP_UNAUTHORIZED
-       ngx.say('401 Access Denied')
-    end
+--- If authentication failed, throw a basic auth
+if not authenticated then
+    ngx.header.content_type = 'text/plain'
+    ngx.header.www_authenticate = 'Basic realm="Home Assistant"'
+    ngx.status = ngx.HTTP_UNAUTHORIZED
+    ngx.say('401 Access Denied')
 end
+
