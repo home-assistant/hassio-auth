@@ -15,7 +15,33 @@ RUN apk add --no-cache \
 ```
 
 ```bash
+WAIT_PIDS=()
+PORT=8431
 
+if [ "$SSL" == "true" ];
+    sed -i "s/%%PORT%%/${PORT}/g" /etc/nginx/nginx-ssl.conf
+    sed -i "s/%%CERTFILE%%/${CERTFILE}/g" /etc/nginx/nginx-ssl.conf
+    sed -i "s/%%KEYFILE%%/${KEYFILE}/g" /etc/nginx/nginx-ssl.conf
+
+    nginx -c /etc/nginx/nginx-ssl.conf &
+else
+    sed -i "s/%%PORT%%/${PORT}/g" /etc/nginx/nginx.conf
+
+    nginx -c /etc/nginx/nginx-ssl.conf &
+fi
+WAIT_PIDS+=($!)
+
+# Register stop
+function stop_addon() {
+    echo "Kill Processes..."
+    kill -15 "${WAIT_PIDS[@]}"
+    wait "${WAIT_PIDS[@]}"
+    echo "Done."
+}
+trap "stop_addon" SIGTERM SIGHUP
+
+# Wait until all is done
+wait "${WAIT_PIDS[@]}"
 ```
 
 ## PAM
