@@ -27,7 +27,7 @@ if [ "$SSL" == "true" ];
 else
     sed -i "s/%%PORT%%/${PORT}/g" /etc/nginx/nginx.conf
 
-    nginx -c /etc/nginx/nginx-ssl.conf &
+    nginx -c /etc/nginx/nginx.conf &
 fi
 WAIT_PIDS+=($!)
 
