@@ -7,7 +7,7 @@ WORKDIR /usr/src
 
 ARG HASSIO_AUTH_VERSION
 RUN apk add --no-cache \
-        nginx nginx-mod-http-lua \
+        nginx nginx-mod-http-lua lua-resty-http \
     && git clone --depth 1 -b $HASSIO_AUTH_VERSION https://github.com/home-assistant/hassio-auth \
     && cd hassio-auth/nginx-frontend \
     && cp -f * /etc/nginx/ \
